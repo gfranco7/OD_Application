@@ -43,7 +43,12 @@ class OneDriveManager:
         self.token = token
         self.datacampus_drive_id = None
         self.datacampus_root_id = None
-
+        
+    def authenticate(self) -> bool:
+        """Realiza autenticación inicial"""
+        if not self.token:
+            raise Exception("No se pudo obtener el token de autenticación")
+        return True
 
     def _make_request(self, method: str, url: str, **kwargs) -> requests.Response:
         """Realizar petición HTTP con manejo de errores"""

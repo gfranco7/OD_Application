@@ -80,6 +80,8 @@ async def login():
     try:
         od_manager = OneDriveManager()
         token = od_manager.authenticate()
+        if not token:
+            raise HTTPException(status_code=401, detail="No se pudo obtener el token de autenticación")
         od_manager.initialize_datacampus()
         
         return AuthResponse(
