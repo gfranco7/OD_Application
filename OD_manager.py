@@ -132,7 +132,7 @@ class OneDriveManager:
         if not filename.endswith('.xlsx'):
             filename += '.xlsx'
         
-        # Datos por defecto si no se proporciona DataFrame
+        # Excel por defecto
         if data is None:
             data = pd.DataFrame({
                 'Columna1': ['Valor1', 'Valor2', 'Valor3'],

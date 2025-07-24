@@ -40,7 +40,7 @@ class AuthManager:
     def _save_cache(self):
         if self.cache.has_state_changed:
             with open(self.cache_path, 'wb') as f:
-                f.write(self.cache.serialize())
+                f.write(self.cache.serialize().encode("utf-8"))
 
     def get_token(self, force_auth: bool = False) -> dict:
         if not force_auth:

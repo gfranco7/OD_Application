@@ -1,5 +1,5 @@
 
-# 📁 Conexión a OneDrive Empresarial con Microsoft Graph API (Como usuario)
+# 📁 Conexión a OneDrive Empresarial con Microsoft Graph API 
 
 Este proyecto permite conectarse a OneDrive (cuenta empresarial), acceder a carpetas compartidas (como `datacampus`), y realizar operaciones básicas con archivos como crear, leer y eliminar archivos Excel mediante Microsoft Graph API y autenticación con `msal` en Python.
 

@@ -5,3 +5,4 @@
 *.pyo
 token_cache.*
 *.bin
+/ignore.py
