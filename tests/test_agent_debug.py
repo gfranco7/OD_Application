@@ -34,9 +34,9 @@ def test_agente():
     
     agent.debug_servidor()
 
-    folder_id="01WIY7HEJD5QQOPTFF5RAYASSHGPP2THIU"
-    file_id = "01WIY7HEPY76YFZ35IOJELCNTE4HK2DKQ5"
-    file_name = "agent_testing.xlsx"
+    folder_id="01WIY7HEJD5QQOPTFF5RAYASSHGPP2THIU" #Informnacion de interés general (folder)
+    file_id = "a1"
+    file_name = "agent_testing_2.xlsx"
     data = {
         "column1": [1, 2, 3],
         "column2": ["A", "B", "C"],
@@ -48,7 +48,7 @@ def test_agente():
         print(" Autenticación exitosa")
         
         print("\nProbando funcion del agente...")
-        contenido = agent.eliminar_elemento(item_id=file_id)
+        contenido = agent.listar_contenido(folder_id)
 
         if contenido:
             print(f"Resultado obtenido: {contenido}")
@@ -59,5 +59,5 @@ def test_agente():
         print(" Error en autenticación")
 
 if __name__ == "__main__":
-    #test_servidor_directo()
+    test_servidor_directo()
     test_agente()
