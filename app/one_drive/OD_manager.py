@@ -10,14 +10,10 @@ from msal import PublicClientApplication, SerializableTokenCache
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
-from auth_manager import AuthManager
+from app.auth.auth_manager import AuthManager
 
 # Inicializar y autenticar
-
 dotenv.load_dotenv()
-auth = AuthManager()
-token = auth.get_token()
-
 
 TENANT_ID = os.getenv("TENANT_ID")
 CLIENT_ID = os.getenv("CLIENT_ID")
@@ -39,15 +35,30 @@ class DriveItem:
 
 class OneDriveManager:
 
-    def __init__(self, token: Dict):
+    def __init__(self, token=None):
+        """Inicializar OneDriveManager con o sin token"""
         self.token = token
+        self.authenticated = token is not None
+        
+        # Inicializar atributos que se usan en initialize_datacampus
         self.datacampus_drive_id = None
         self.datacampus_root_id = None
         
-    def authenticate(self) -> bool:
-        """Realiza autenticación inicial"""
+        if token:
+            self._initialize_with_token(token)
+    
+    def _initialize_with_token(self, token):
+        """Inicialización con token válido"""
+        self.token = token
+        self.authenticated = True
+
+    def authenticate(self):
+        """Método para autenticar después de la inicialización"""
         if not self.token:
-            raise Exception("No se pudo obtener el token de autenticación")
+            # Obtener token usando AuthManager
+            auth = AuthManager()
+            self.token = auth.get_token()
+            self.authenticated = True
         return True
 
     def _make_request(self, method: str, url: str, **kwargs) -> requests.Response:
@@ -233,14 +244,7 @@ class OneDriveManager:
             raise Exception(f"Error al obtener información: {response.status_code} - {response.text}")
 
 
-
-#def autenticar():
-#    """Función de compatibilidad"""
-#    manager = OneDriveManager()
-#    return manager.authenticate()
-
 def encontrar_carpeta_datacampus(token):
     """Función de compatibilidad"""
-    manager = OneDriveManager()
-    manager.token = token
+    manager = OneDriveManager(token)
     return manager.initialize_datacampus()

@@ -92,12 +92,14 @@ class DatacampusAgent:
             response = self.session.post(f"{self.base_url}/files/excel", json=payload)
             response.raise_for_status()
             result = response.json()
+            print(f"Archivo creado: {result.get('file_id')}")
             return result.get("file_id")
+        
         except Exception as e:
             print(f"Error al crear archivo: {e}")
             return None
 
-    def eliminar_elemento(self, item_id: str) -> bool:
+    def eliminar_elemento(self, item_id: str) -> bool:  
         """Elimina un archivo o carpeta"""
         if not self.token_ok:
             print("No autenticado. Llamar primero a autenticar()")
@@ -106,7 +108,8 @@ class DatacampusAgent:
         try:
             response = self.session.delete(f"{self.base_url}/items/{item_id}")
             response.raise_for_status()
-            return True
+            print("Elemento eliminado correctamente")
+            return True 
         except Exception as e:
             print(f"Error al eliminar elemento: {e}")
             return False

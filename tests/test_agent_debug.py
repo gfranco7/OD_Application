@@ -1,10 +1,10 @@
 # test_agent_debug.py
-from datacampus_agent import DatacampusAgent
+from app.agents.datacampus_agent import DatacampusAgent
 import requests
 
 def test_servidor_directo():
     """Prueba directa del servidor para comparar"""
-    print("=== PRUEBA DIRECTA DEL SERVIDOR ===")
+    print("--- PRUEBA DIRECTA DEL SERVIDOR ---")
     try:
         # Prueba básica de conectividad
         response = requests.get("http://localhost:8000/")
@@ -29,27 +29,35 @@ def test_servidor_directo():
 
 def test_agente():
     """Prueba el agente"""
-    print("\n=== PRUEBA DEL AGENTE ===")
+    print("\n--- PRUEBA DEL AGENTE ---")
     agent = DatacampusAgent()
     
     agent.debug_servidor()
-    
-    # Intentar autenticar
+
+    folder_id="01WIY7HEJD5QQOPTFF5RAYASSHGPP2THIU"
+    file_id = "01WIY7HEPY76YFZ35IOJELCNTE4HK2DKQ5"
+    file_name = "agent_testing.xlsx"
+    data = {
+        "column1": [1, 2, 3],
+        "column2": ["A", "B", "C"],
+        "column3": [10.5, 20.5, 30.5],
+        "column4": ["X", "Y", "Z"]
+    }
     print("\nIntentando autenticación...")
     if agent.autenticar():
-        print("✓ Autenticación exitosa")
+        print(" Autenticación exitosa")
         
-        # Probar otras funciones
-        print("\nProbando listar contenido...")
-        contenido = agent.listar_contenido()
+        print("\nProbando funcion del agente...")
+        contenido = agent.eliminar_elemento(item_id=file_id)
+
         if contenido:
-            print(f"✓ Contenido obtenido: {contenido}")
+            print(f"Resultado obtenido: {contenido}")
         else:
-            print("✗ Error al obtener contenido")
+            print(" Error al obtener contenido")
             
     else:
-        print("✗ Error en autenticación")
+        print(" Error en autenticación")
 
 if __name__ == "__main__":
-    test_servidor_directo()
+    #test_servidor_directo()
     test_agente()

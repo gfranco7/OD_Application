@@ -7,10 +7,10 @@ import pandas as pd
 import io
 import json
 from datetime import datetime
-from auth_manager import AuthManager
-from OD_manager import *
+from app.auth.auth_manager import AuthManager
+from app.one_drive.OD_manager import *
 
-from OD_manager import OneDriveManager
+from app.one_drive.OD_manager import OneDriveManager
 
 app = FastAPI(
     title="OneDrive Manager API",
@@ -30,7 +30,6 @@ app.add_middleware(
 # Instancia global del manager (en producción usar dependency injection)
 od_manager = None
 
-# Modelos Pydantic
 class ItemResponse(BaseModel):
     id: str
     name: str
@@ -78,19 +77,27 @@ async def login():
     """Inicializar autenticación con OneDrive"""
     global od_manager
     try:
-        od_manager = OneDriveManager()
-        token = od_manager.authenticate()
-        if not token:
-            raise HTTPException(status_code=401, detail="No se pudo obtener el token de autenticación")
-        od_manager.initialize_datacampus()
+        # Obtener token primero antes de crear OneDriveManager
+        print(" Iniciando proceso de autenticación...")
+        auth = AuthManager()
+        token = auth.get_token()
         
+        print(" Token obtenido, creando OneDriveManager...")
+        od_manager = OneDriveManager(token)  #  Pasar el token al constructor
+        
+        print(" Inicializando datacampus...")
+        od_manager.initialize_datacampus()
+
+        print(" Autenticación completada exitosamente")
         return AuthResponse(
             status="success",
             message="Autenticación exitosa",
-            expires_in=token.get("expires_in", 3600)
+            expires_in=token.get("expires_in", 3600) if isinstance(token, dict) else 3600
         )
     except Exception as e:
+        print(f" Error en autenticación: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error en autenticación: {str(e)}")
+
 
 @app.get("/auth/status", response_model=AuthResponse)
 async def auth_status():
@@ -348,4 +355,4 @@ async def global_exception_handler(request, exc):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)                                    
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

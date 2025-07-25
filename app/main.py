@@ -1,8 +1,8 @@
-from OD_manager import OneDriveManager, DriveItem
+from app.one_drive.OD_manager import OneDriveManager, DriveItem
 import pandas as pd
 from typing import List, Optional
-from auth_manager import AuthManager
-from OD_manager import OneDriveManager
+from app.auth.auth_manager import AuthManager
+from app.one_drive.OD_manager import OneDriveManager
 
 class OneDriveNavigator:
 
