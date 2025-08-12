@@ -1,129 +1,136 @@
 
-# 📁 Conexión a OneDrive Empresarial con Microsoft Graph API 
+# 📚 Documentación - OneDrive Manager API
 
-Este proyecto permite conectarse a OneDrive (cuenta empresarial), acceder a carpetas compartidas (como `datacampus`), y realizar operaciones básicas con archivos como crear, leer y eliminar archivos Excel mediante Microsoft Graph API y autenticación con `msal` en Python.
+Este proyecto permite gestionar archivos y carpetas en una cuenta de OneDrive usando una API construida con FastAPI, integrando autenticación vía Microsoft Graph.
 
-## ✅ Requisitos
+---
 
-- Cuenta de Microsoft con permisos sobre los recursos de OneDrive.
-- Cliente registrado en [Azure Portal](https://portal.azure.com/).
-- Permisos delegados:
-  - `Files.ReadWrite.All`
-  - `Sites.ReadWrite.All`
-  - `User.Read`
-- Python 3.8 o superior
-- Librerías:
-  - `requests`
-  - `msal`
-  - `pandas`
-  - `openpyxl`
-  - `python-dotenv`
-
-## 🧠 Arquitectura
+## 📁 Estructura del Proyecto
 
 ```
-main.py ─────► OD_manager.py
-              └─ Autenticación
-              └─ Navegación entre carpetas
-              └─ Creación/lectura/borrado de archivos
+od_application/
+│
+├── app/                         # Código fuente principal de la app
+│   ├── __init__.py
+│   ├── main.py                  # Punto de entrada de FastAPI
+│   ├── api_server.py            # Definición de rutas y endpoints
+│   ├── auth/                    # Módulo de autenticación
+│   │   ├── __init__.py
+│   │   └── auth_manager.py
+│   ├── od/                      # Lógica específica de OneDrive
+│   │   ├── __init__.py
+│   │   └── od_manager.py
+│   ├── agents/                  # Agentes o clientes que consumen la API
+│   │   ├── __init__.py
+│   │   └── datacampus_agent.py
+│   └── config.py                # Configuración global (usa dotenv)
+│
+├── tests/                       # Tests (unitarios o de integración)
+│   ├── __init__.py
+│   └── test_agent_debug.py
+│
+├── .env                         # Variables de entorno
+├── .gitignore                   # Archivos a ignorar por git
+├── README.md                    # Documentación del proyecto
+├── requirements.txt             # Dependencias del entorno
 ```
 
 ---
 
-## ⚙️ Configuración Inicial
+## 🧠 Descripción de los Módulos
 
-1. Crea un archivo `.env` con las siguientes variables:
+### 🔐 `auth_manager.py`
+- Autenticación con Microsoft Graph API usando `msal`.
+- Usa flujo de dispositivo (`device code flow`) para iniciar sesión.
+- Cachea el token en disco para sesiones futuras.
 
-```env
+### ☁️ `OD_manager.py`
+- Abstracción de operaciones sobre OneDrive:
+  - Crear/leer archivos Excel.
+  - Listar carpetas.
+  - Eliminar archivos.
+  - Buscar elementos.
+- Usa el token autenticado del `AuthManager`.
+
+### 🌐 `api_server.py`
+- Define la API REST con FastAPI.
+- Expone endpoints como:
+  - `/auth/login`
+  - `/folders`
+  - `/files/{id}/content`
+  - `/files/excel`
+  - `/items/{id}` (delete)
+- Usa `Depends()` para controlar el acceso autenticado.
+
+### ⚙️ `config.py`
+- Centraliza la configuración cargando variables desde `.env`.
+- Contiene los `SCOPES`, `AUTHORITY`, `CLIENT_ID`, `TENANT_ID`.
+
+### 🧪 `test_agent_debug.py`
+- Realiza pruebas automáticas de los endpoints y del agente.
+- Permite verificar que el backend responde y autentica correctamente.
+
+### 🤖 `datacampus_agent.py`
+- Cliente HTTP que consume la API de `api_server.py`.
+- Métodos disponibles:
+  - `autenticar()`
+  - `listar_contenido()`
+  - `crear_reporte()`
+  - `obtener_excel_como_json()`
+  - `eliminar_elemento()`
+
+### 🚀 `main.py`
+- Punto de entrada del proyecto.
+- Lanza el servidor FastAPI con Uvicorn:
+  ```bash
+  python main.py
+  ```
+
+---
+
+## ⚙️ Requisitos
+
+- Python 3.10 o superior.
+- Credenciales válidas de Azure App Registrations (CLIENT_ID y TENANT_ID).
+- Microsoft Graph habilitado para acceso a OneDrive personal o empresarial.
+
+Instala los requisitos con:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## ▶️ Cómo ejecutar
+
+### 1. Configura tu `.env`
+
+```
+CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
-2. Instala las dependencias:
+### 2. Ejecuta el servidor:
 
 ```bash
-pip install msal requests pandas openpyxl python-dotenv
-```
-
----
-
-## 🚀 ¿Qué hace este proyecto?
-
-### 1. Autenticación con Microsoft
-
-Se usa `msal` con flujo `device_code` para iniciar sesión desde navegador. Esto evita necesitar permisos de administrador global.
-
-```python
-token = autenticar()
-```
-
-### 2. Acceso a carpetas compartidas
-
-Se lista el contenido compartido con el usuario y se localiza la carpeta `datacampus`:
-
-```python
-drive_id, root_id = encontrar_carpeta_datacampus(token)
-```
-
-### 3. Buscar subcarpeta `Documentos`
-
-```python
-documentos_id = buscar_subcarpeta(token, drive_id, root_id, "Documentos")
-```
-
-### 4. Crear un archivo Excel
-
-```python
-crear_excel_en_carpeta(token, drive_id, documentos_id, "test.xlsx")
-```
-
-Se guarda un `DataFrame` de ejemplo en memoria y se sube como archivo Excel.
-
-### 5. Leer archivos Excel existentes
-
-```python
-df = descargar_y_convertir_excel(token, drive_id, archivo_id, archivo_nombre)
-```
-
-### 6. Eliminar un archivo
-
-```python
-eliminar_archivo(token, drive_id, archivo_id)
-```
-
----
-
-## 🧪 Comandos disponibles (`main.py`)
-
-Al ejecutar:
-
-```bash
+cd OD_Application
 python main.py
 ```
 
-Se muestran 2 opciones:
-
-- `2`: Crear y opcionalmente eliminar un archivo `test.xlsx`.
-- `3`: Leer todos los archivos `.xlsx` en la carpeta `Documentos`.
+La API estará disponible en: [http://localhost:8000](http://localhost:8000)  
+Documentación interactiva: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
-## 🧩 Escalabilidad
+## 📌 Endpoints clave
 
-Este sistema está pensado para proyectos futuros donde se necesite automatizar la interacción con archivos de OneDrive:
-
-- Centralización de reportes en carpetas compartidas.
-- Extracción de datos empresariales desde Excel.
-- Automatización de flujos de lectura/escritura en equipo.
-
----
-
-## 🛡️ Seguridad
-
-- No se almacenan tokens de acceso.
-- Se usa flujo de autenticación delegado.
-- Toda autenticación requiere acción del usuario y se revoca automáticamente tras el cierre de sesión o expiración del token.
-
----
-
-
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `POST` | `/auth/login` | Autenticación con OneDrive |
+| `GET`  | `/folders` | Listar carpetas y archivos |
+| `POST` | `/files/excel` | Crear archivo Excel |
+| `GET`  | `/files/{id}/content` | Leer archivo como JSON |
+| `PUT`  | `/files/{id}/content` | Actualizar archivo Excel |
+| `DELETE` | `/items/{id}` | Eliminar archivo o carpeta |
+| `POST` | `/files/upload` | Subir archivo `.xlsx` |

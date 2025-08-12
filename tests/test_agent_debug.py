@@ -1,4 +1,4 @@
-# test_agent_debug.py
+
 from app.agents.datacampus_agent import DatacampusAgent
 import requests
 
@@ -31,17 +31,16 @@ def test_agente():
     """Prueba el agente"""
     print("\n--- PRUEBA DEL AGENTE ---")
     agent = DatacampusAgent()
-    
     agent.debug_servidor()
 
-    folder_id="01WIY7HEJD5QQOPTFF5RAYASSHGPP2THIU" #Informnacion de interés general (folder)
-    file_id = "a1"
+    folder_id="01WIY7HEKV7QDOKHS275DJM4SWMEWTRSBD" #Informnacion de interés general (folder)
+    file_id = "01WIY7HEI2VMIKOFO545DZM75KBVVRXKX3" #Cartera por edades (copia en AI academy)
     file_name = "agent_testing_2.xlsx"
     data = {
         "column1": [1, 2, 3],
         "column2": ["A", "B", "C"],
         "column3": [10.5, 20.5, 30.5],
-        "column4": ["X", "Y", "Z"]
+        "column4": ["X", "Y", "Z"]  
     }
     print("\nIntentando autenticación...")
     if agent.autenticar():
@@ -54,10 +53,9 @@ def test_agente():
             print(f"Resultado obtenido: {contenido}")
         else:
             print(" Error al obtener contenido")
-            
     else:
         print(" Error en autenticación")
 
 if __name__ == "__main__":
-    test_servidor_directo()
+    #test_servidor_directo()
     test_agente()

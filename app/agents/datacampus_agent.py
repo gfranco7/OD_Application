@@ -51,7 +51,7 @@ class DatacampusAgent:
     def listar_contenido(self, folder_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """Lista contenido de carpeta"""
         if not self.token_ok:
-            print("No autenticado. Llamar primero a autenticar()")
+            print("Autenticacion fallida")
             return None
             
         try:
@@ -66,7 +66,7 @@ class DatacampusAgent:
     def obtener_excel_como_json(self, file_id: str) -> Optional[Dict[str, Any]]:
         """Obtiene el contenido de un archivo Excel como JSON"""
         if not self.token_ok:
-            print("No autenticado. Llamar primero a autenticar()")
+            print("Autenticacion fallida")
             return None
             
         try:
@@ -80,7 +80,7 @@ class DatacampusAgent:
     def crear_reporte(self, folder_id: str, nombre_archivo: str, datos: Dict[str, list]) -> Optional[str]:
         """Crea un archivo Excel en la carpeta especificada con datos dados"""
         if not self.token_ok:
-            print("No autenticado. Llamar primero a autenticar()")
+            print("Autenticacion fallida")
             return None
             
         try:
@@ -102,7 +102,7 @@ class DatacampusAgent:
     def eliminar_elemento(self, item_id: str) -> bool:  
         """Elimina un archivo o carpeta"""
         if not self.token_ok:
-            print("No autenticado. Llamar primero a autenticar()")
+            print("Autenticacion fallida")
             return False
             
         try:
